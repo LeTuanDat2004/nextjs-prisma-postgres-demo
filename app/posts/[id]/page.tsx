@@ -10,15 +10,44 @@ export default async function Post({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await auth();
   const { id } = await params;
-  const post = await prisma.post.findUnique({
-    where: { id: parseInt(id) },
-    include: {
-      author: true,
-    },
-  });
+  const session = await auth();
 
+  let post = null;
+
+  try {
+    post = await prisma.post.findUnique({
+      where: { id: Number(id) },
+      include: {
+        author: true,
+      },
+    });
+  } catch (error) {
+    console.error("Database error:", error);
+
+    // 👉 Fallback UI khi DB chưa sẵn sàng
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center max-w-md">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            Database chưa sẵn sàng
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Ứng dụng hiện chưa kết nối được cơ sở dữ liệu.
+            Vui lòng thử lại sau.
+          </p>
+          <Link
+            href="/"
+            className="inline-block px-4 py-2 bg-gray-900 text-white rounded-md"
+          >
+            Quay về trang chủ
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ Có DB nhưng không có post
   if (!post) {
     notFound();
   }
@@ -38,7 +67,7 @@ export default async function Post({
                 {isAuthor && (
                   <Link
                     href={`/posts/${post.id}/edit`}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors"
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium"
                   >
                     Edit Post
                   </Link>
@@ -69,7 +98,7 @@ export default async function Post({
                 )}
                 <Link
                   href={`/users/${post.authorId}`}
-                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-gray-600 hover:text-gray-900"
                 >
                   By {formatName(post.author.name)}
                 </Link>
@@ -89,7 +118,7 @@ export default async function Post({
           <div className="border-t border-gray-100 mt-12 pt-6">
             <Link
               href={`/users/${post.authorId}`}
-              className="text-gray-500 hover:text-gray-700 transition-colors"
+              className="text-gray-500 hover:text-gray-700"
             >
               ← Back to author&apos;s profile
             </Link>
