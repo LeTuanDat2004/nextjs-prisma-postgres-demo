@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { auth } from "@/auth";
 import { PostForm } from "@/components/post";
 import prisma from "@/lib/prisma";
