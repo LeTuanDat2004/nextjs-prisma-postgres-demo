@@ -1,11 +1,10 @@
+export const dynamic = 'force-dynamic';
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
 import { formatName } from "@/lib/utils";
 import { auth } from "@/auth";
-
-export const dynamic = 'force-dynamic';
 
 export default async function Post({
   params,
